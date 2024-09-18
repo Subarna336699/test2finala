@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dinner Booking Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        .error {
+            color: red;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .confirmation {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Book Your Place for Dinner</h1>
+
+    <div>
+        <label for="name">Name:</label>
+        <input type="text" id="name" size="22" placeholder="">
+        <span id="nameError" class="error"></span><br>
+        
+        <label for="phone">Phone Number:</label>
+        <input type="text" id="phone" size="22" maxlength="6" placeholder="">
+        <span id="phoneError" class="error"></span><br>
+    </div>
+
+    <h2>Select a time</h2>
+    <div>
+        <input type="radio" id="time5" name="time" value="5" checked>
+        <label for="time5">5:00 PM</label><br>
+        <input type="radio" id="time6" name="time" value="6">
+        <label for="time6">6:00 PM</label><br>
+        <input type="radio" id="time7" name="time" value="7">
+        <label for="time7">7:00 PM</label><br>
+        <input type="radio" id="time8" name="time" value="8">
+        <label for="time8">8:00 PM</label><br>
+    </div>
+
+    <h2>What would you like to have with us?</h2>
+    <div>
+        <input type="checkbox" id="starters" name="meal" value="Starters">
+        <label for="starters">Starters</label><br>
+        <input type="checkbox" id="main" name="meal" value="Main Course">
+        <label for="main">Main Course</label><br>
+        <input type="checkbox" id="dessert" name="meal" value="Dessert">
+        <label for="dessert">Dessert</label><br>
+        <input type="checkbox" id="drinks" name="meal" value="Drinks">
+        <label for="drinks">Drinks</label><br>
+    </div>
+
+    <div>
+        <button id="submit" onclick="submitForm()" disabled>Submit</button>
+        <button onclick="clearForm()">Clear</button>
+    </div>
+
+    <div id="confirmationMessage" class="confirmation"></div>
+
+    <script>
+        
+        function validateName() {
+            const name = document.getElementById("name").value.trim();
+            const nameError = document.getElementById("nameError");
+            const namePattern = /^[A-Za-z\s]+$/;
+            if (!name || !name.includes(" ") || !namePattern.test(name)) {
+                nameError.textContent = "Please enter a valid first and last name.";
+                return false;
+            } else {
+                nameError.textContent = "";
+                return true;
+            }
+        }
+
+       
+        function validatePhone() {
+            const phone = document.getElementById("phone").value.trim();
+            const phoneError = document.getElementById("phoneError");
+            const phonePattern = /^[0-9][a-zA-Z0-9]{5}$/; 
+            
+            if (!phonePattern.test(phone)) {
+                phoneError.textContent = "Phone number must be 6 characters, start with a digit, and can contain letters.";
+                return false;
+            } else {
+                phoneError.textContent = "";
+                return true;
+            }
+        }
+
+        
+        function validateForm() {
+            const isNameValid = validateName();
+            const isPhoneValid = validatePhone();
+            const submitButton = document.getElementById("submit");
+            submitButton.disabled = !(isNameValid && isPhoneValid);
+        }
+
+        
+        function getSelectedTime() {
+            const timeRadios = document.getElementsByName("time");
+            for (let i = 0; i < timeRadios.length; i++) {
+                if (timeRadios[i].checked) {
+                    return timeRadios[i].nextElementSibling.textContent;
+                }
+            }
+            return "";
+        }
+
+       
+        function getSelectedMeals() {
+            const mealCheckboxes = document.querySelectorAll('input[name="meal"]:checked');
+            const meals = [];
+            mealCheckboxes.forEach(checkbox => {
+                meals.push(checkbox.nextElementSibling.textContent);
+            });
+            return meals.join(", ");
+        }
+
+       
+        function submitForm() {
+            if (validateName() && validatePhone()) {
+                const name = document.getElementById("name").value.trim();
+                const phone = document.getElementById("phone").value.trim();
+                const selectedTime = getSelectedTime();
+                const selectedMeals = getSelectedMeals();
+
+                const confirmationMessage = `
+                    <h2>Booking Confirmed!</h2>
+                    <p><strong>Name:</strong> ${name}</p>
+                    <p><strong>Phone Number:</strong> ${phone}</p>
+                    <p><strong>Time:</strong> ${selectedTime}</p>
+                    <p><strong>Preferences:</strong> ${selectedMeals}</p>
+                `;
+                document.getElementById("confirmationMessage").innerHTML = confirmationMessage;
+                
+               
+                document.getElementById("submit").disabled = true;
+            } else {
+                alert("Please correct the errors before submitting.");
+            }
+        }
+
+       
+        function clearForm() {
+            document.getElementById("name").value = "";
+            document.getElementById("phone").value = "";
+            document.getElementById("nameError").textContent = "";
+            document.getElementById("phoneError").textContent = "";
+            document.getElementById("confirmationMessage").innerHTML = "";
+            document.getElementById("submit").disabled = true;
+        }
+
+     
+        document.getElementById("name").addEventListener("input", validateForm);
+        document.getElementById("phone").addEventListener("input", validateForm);
+
+      
+        window.onload = function() {
+            document.getElementById("name").focus();
+        };
+    </script>
+</body>
+</html>
